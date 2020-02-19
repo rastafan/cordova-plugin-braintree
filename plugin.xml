@@ -28,9 +28,9 @@
 
         <source-file src="src/android/BraintreePlugin.java" target-dir="src/net/justincredible" />
 
-        <framework src="com.android.support:support-v13:27.+" />
-        <framework src="com.android.support:appcompat-v7:27.+" />
-        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <framework src="com.android.support:support-v14:28.+" />
+        <framework src="com.android.support:appcompat-v7:28.+" />
+	<framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
 
         <config-file target="AndroidManifest.xml" parent="application">
             <activity android:name="com.braintreepayments.api.BraintreePaymentActivity" />
