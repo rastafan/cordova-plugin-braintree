@@ -30,7 +30,7 @@
 
         <framework src="com.android.support:support-v4:28.+" />
         <framework src="com.android.support:appcompat-v7:28.+" />
-	<framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
+        <framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
 
         <config-file target="AndroidManifest.xml" parent="application">
             <activity android:name="com.braintreepayments.api.BraintreePaymentActivity" />
