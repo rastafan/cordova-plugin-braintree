@@ -66,16 +66,17 @@ declare module BraintreePlugin {
         /**
          * The amount of the transaction to show in the drop-in UI on the
          * summary row as well as the call to action button.
-         * Defaults to empty string.
+         * Mandatory for 3DS.
          */
-        amount?: string;
+        amount: string;
 
         /**
          * The description of the transaction to show in the drop-in UI on the
          * summary row.
-         * Defaults to empty string.
+         * Mandatory for 3DS.
+         * TODO: Add separate email field.
          */
-        primaryDescription?: string;
+        primaryDescription: string;
     }
 
     /**

@@ -25,6 +25,7 @@ import com.braintreepayments.api.models.PayPalAccountNonce;
 import com.braintreepayments.api.models.PayPalRequest;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.braintreepayments.api.models.ThreeDSecureInfo;
+import com.braintreepayments.api.models.ThreeDSecureRequest;
 import com.braintreepayments.api.models.VenmoAccountNonce;
 import com.braintreepayments.cardform.view.CardForm;
 //import com.google.android.gms.wallet.Cart;
@@ -148,13 +149,19 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
 
         // Mandatory email for 3DS
         String email= args.getString(1);
-        if (amount == null) {
+        if (email == null) {
             _callbackContext.error("email is required.");
         }
 
         dropInRequest = new DropInRequest().clientToken(temporaryToken);
         dropInRequest.cardholderNameStatus(CardForm.FIELD_REQUIRED);
         dropInRequest.vaultManager(true);
+
+        ThreeDSecureRequest threeDRequest = new ThreeDSecureRequest();
+        threeDRequest.amount(amount);
+        threeDRequest.email(email);
+        threeDRequest.versionRequested(ThreeDSecureRequest.VERSION_2);
+        dropInRequest.threeDSecureRequest(threeDRequest);
 
         if (dropInRequest == null) {
             _callbackContext.error("The Braintree client failed to initialize.");

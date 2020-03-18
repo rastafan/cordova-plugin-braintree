@@ -1,4 +1,5 @@
 # Changes
+0.7.1 - 3DS is mandatory. Typescript and Cordova wrappers not updated: use paymentDescription field to pass email.
 0.7.0 - update Braintree SDK to latest: iOS v4 and Anrdoid v3. Replace Carthage with Pods on iOS.
 
 # NOTE

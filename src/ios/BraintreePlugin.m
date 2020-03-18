@@ -15,6 +15,7 @@
 #import <BraintreePayPal.h>
 #import <BraintreeApplePay.h>
 #import <BraintreeVenmo.h>
+#import <BraintreePaymentFlow.h>
 #import "AppDelegate.h"
 
 @interface BraintreePlugin() <PKPaymentAuthorizationViewControllerDelegate>
@@ -141,7 +142,6 @@ NSString *countryCode;
     // Obtain the arguments.
 
     NSString* amount = (NSString *)[command.arguments objectAtIndex:0];
-    NSDecimalNumber* amount3d = (NSDecimalNumber *)[command.arguments objectAtIndex:0];
     if ([amount isKindOfClass:[NSNumber class]]) {
         amount = [(NSNumber *)amount stringValue];
         
@@ -153,7 +153,16 @@ NSString *countryCode;
     }
 
     NSString* primaryDescription = [command.arguments objectAtIndex:1];
-
+    
+    // TODO:
+    NSString* email = [command.arguments objectAtIndex:1];
+    
+    if (!email) {
+        CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"email is required."];
+        [self.commandDelegate sendPluginResult:res callbackId:command.callbackId];
+        return;
+    }
+    
     // Save off the Cordova callback ID so it can be used in the completion handlers.
     dropInUIcallbackId = command.callbackId;
 
@@ -161,6 +170,16 @@ NSString *countryCode;
     paymentRequest.applePayDisabled = !applePayInited;
     paymentRequest.cardholderNameSetting = BTFormFieldRequired;
     paymentRequest.vaultManager = true;
+
+
+    // 3DSecure is mandatory
+    NSDecimalNumber* amount3D = (NSDecimalNumber *)[command.arguments objectAtIndex:0];
+    BTThreeDSecureRequest *threeDRequest = [[BTThreeDSecureRequest alloc] init];
+    threeDRequest.amount = amount3D;
+    threeDRequest.email = email;
+    threeDRequest.versionRequested = BTThreeDSecureVersion2;
+    
+    paymentRequest.threeDSecureRequest = threeDRequest;
     
     BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:self.token request:paymentRequest handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
         [self.viewController dismissViewControllerAnimated:YES completion:nil];
