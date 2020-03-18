@@ -1,3 +1,6 @@
+# Changes
+0.7.0 - update Braintree SDK to latest: iOS v4 and Anrdoid v3. Replace Carthage with Pods on iOS.
+
 # NOTE
 This repo is a fork of https://github.com/taracque/cordova-plugin-braintree. All active development should point to there - this repo exists only so that I can keep pushing this plugin forward while Taracque maintains the stable branch.
 

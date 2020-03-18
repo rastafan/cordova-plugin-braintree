@@ -2,19 +2,19 @@
 //  BraintreePlugin.m
 //
 //  Copyright (c) 2016 Justin Unterreiner. All rights reserved.
+//  Copyright (c) 2020 Madis Udam. All rights reserved.
 //
 
 #import "BraintreePlugin.h"
 #import <objc/runtime.h>
-#import <BraintreeDropIn/BraintreeDropIn.h>
-#import <BraintreeDropIn/BTDropInController.h>
-#import <BraintreeCore/BTAPIClient.h>
-#import <BraintreeCore/BTPaymentMethodNonce.h>
-#import <BraintreeCard/BTCardNonce.h>
-#import <BraintreePayPal/BraintreePayPal.h>
-#import <BraintreeApplePay/BraintreeApplePay.h>
-#import <Braintree3DSecure/Braintree3DSecure.h>
-#import <BraintreeVenmo/BraintreeVenmo.h>
+#import <BraintreeDropIn.h>
+#import <BTDropInController.h>
+#import <BTAPIClient.h>
+#import <BTPaymentMethodNonce.h>
+#import <BTCardNonce.h>
+#import <BraintreePayPal.h>
+#import <BraintreeApplePay.h>
+#import <BraintreeVenmo.h>
 #import "AppDelegate.h"
 
 @interface BraintreePlugin() <PKPaymentAuthorizationViewControllerDelegate>
@@ -141,8 +141,10 @@ NSString *countryCode;
     // Obtain the arguments.
 
     NSString* amount = (NSString *)[command.arguments objectAtIndex:0];
+    NSDecimalNumber* amount3d = (NSDecimalNumber *)[command.arguments objectAtIndex:0];
     if ([amount isKindOfClass:[NSNumber class]]) {
         amount = [(NSNumber *)amount stringValue];
+        
     }
     if (!amount) {
         CDVPluginResult *res = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"amount is required."];
@@ -155,11 +157,11 @@ NSString *countryCode;
     // Save off the Cordova callback ID so it can be used in the completion handlers.
     dropInUIcallbackId = command.callbackId;
 
-    /* Drop-IN 5.0 */
     BTDropInRequest *paymentRequest = [[BTDropInRequest alloc] init];
-    paymentRequest.amount = amount;
     paymentRequest.applePayDisabled = !applePayInited;
-
+    paymentRequest.cardholderNameSetting = BTFormFieldRequired;
+    paymentRequest.vaultManager = true;
+    
     BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:self.token request:paymentRequest handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
         [self.viewController dismissViewControllerAnimated:YES completion:nil];
         if (error != nil) {
@@ -282,7 +284,6 @@ NSString *countryCode;
     BTCardNonce *cardNonce;
     BTPayPalAccountNonce *payPalAccountNonce;
     BTApplePayCardNonce *applePayCardNonce;
-    BTThreeDSecureCardNonce *threeDSecureCardNonce;
     BTVenmoAccountNonce *venmoAccountNonce;
 
     if ([paymentMethodNonce isKindOfClass:[BTCardNonce class]]) {
@@ -295,10 +296,6 @@ NSString *countryCode;
 
     if ([paymentMethodNonce isKindOfClass:[BTApplePayCardNonce class]]) {
         applePayCardNonce = (BTApplePayCardNonce*)paymentMethodNonce;
-    }
-
-    if ([paymentMethodNonce isKindOfClass:[BTThreeDSecureCardNonce class]]) {
-        threeDSecureCardNonce = (BTThreeDSecureCardNonce*)paymentMethodNonce;
     }
 
     if ([paymentMethodNonce isKindOfClass:[BTVenmoAccountNonce class]]) {
@@ -334,15 +331,15 @@ NSString *countryCode;
                                   @"applePayCard": !applePayCardNonce ? [NSNull null] : @{
                                           },
 
-                                  // BTThreeDSecureCardNonce Fields
-                                  @"threeDSecureCard": !threeDSecureCardNonce ? [NSNull null] : @{
-                                          @"liabilityShifted": threeDSecureCardNonce.liabilityShifted ? @YES : @NO,
-                                          @"liabilityShiftPossible": threeDSecureCardNonce.liabilityShiftPossible ? @YES : @NO
+                                  // BTThreeDSecureCard Fields
+                                  @"threeDSecureCard": !cardNonce ? [NSNull null] : @{
+                                          @"liabilityShifted": cardNonce.threeDSecureInfo.liabilityShifted ? @YES : @NO,
+                                          @"liabilityShiftPossible": cardNonce.threeDSecureInfo.liabilityShiftPossible ? @YES : @NO,
                                           },
 
                                   // BTVenmoAccountNonce Fields
                                   @"venmoAccount": !venmoAccountNonce ? [NSNull null] : @{
-                                          @"username": venmoAccountNonce.username
+                                          @"username": venmoAccountNonce.username,
                                           }
                                   };
     return dictionary;
@@ -404,4 +401,3 @@ NSString *countryCode;
 }
 
 @end
-

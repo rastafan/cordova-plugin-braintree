@@ -26,6 +26,7 @@ import com.braintreepayments.api.models.PayPalRequest;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 import com.braintreepayments.api.models.ThreeDSecureInfo;
 import com.braintreepayments.api.models.VenmoAccountNonce;
+import com.braintreepayments.cardform.view.CardForm;
 //import com.google.android.gms.wallet.Cart;
 //import com.google.android.gms.wallet.LineItem;
 
@@ -131,25 +132,9 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
 
     private synchronized void presentDropInPaymentUI(final JSONArray args) throws JSONException {
 
-        // Ensure the client has been initialized.
-        if (temporaryToken == null) {
-            _callbackContext.error("The Braintree client must first be initialized via BraintreePlugin.initialize(token)");
-            return;
-        }
-
-        String btToken = temporaryToken;
-        temporaryToken = null;
-
-        dropInRequest = new DropInRequest().clientToken(btToken);
-
-        if (dropInRequest == null) {
-            _callbackContext.error("The Braintree client failed to initialize.");
-            return;
-        }
-
         // Ensure we have the correct number of arguments.
-        if (args.length() < 1) {
-            _callbackContext.error("amount is required.");
+        if (args.length() < 2) {
+            _callbackContext.error("amount and email are required.");
             return;
         }
 
@@ -161,11 +146,22 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
             _callbackContext.error("amount is required.");
         }
 
-        String primaryDescription = args.getString(1);
+        // Mandatory email for 3DS
+        String email= args.getString(1);
+        if (amount == null) {
+            _callbackContext.error("email is required.");
+        }
 
-        dropInRequest.amount(amount);
+        dropInRequest = new DropInRequest().clientToken(temporaryToken);
+        dropInRequest.cardholderNameStatus(CardForm.FIELD_REQUIRED);
+        dropInRequest.vaultManager(true);
 
-        if (dropInRequest.isAndroidPayEnabled()) {
+        if (dropInRequest == null) {
+            _callbackContext.error("The Braintree client failed to initialize.");
+            return;
+        }
+
+        if (dropInRequest.isGooglePaymentEnabled()) {
             // // TODO: Make this conditional
             // dropInRequest.androidPayCart(Cart.newBuilder()
             //     .setCurrencyCode("GBP")
@@ -206,7 +202,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
     }
 
     private synchronized void paypalProcessVaulted() throws Exception {
-        PayPal.authorizeAccount(braintreeFragment);
+        //PayPal.authorizeAccount(braintreeFragment);
     }
 
     // Results
@@ -345,7 +341,7 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
                 Map<String, Object> innerMap = new HashMap<String, Object>();
                 innerMap.put("liabilityShifted", threeDSecureInfo.isLiabilityShifted());
                 innerMap.put("liabilityShiftPossible", threeDSecureInfo.isLiabilityShiftPossible());
-
+                innerMap.put("enrolled", threeDSecureInfo.getEnrolled());
                 resultMap.put("threeDSecureCard", innerMap);
             }
         }
@@ -376,8 +372,8 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
             JSONObject json = new JSONObject();
 
             json.put("nonce", paymentMethodNonce.getNonce().toString());
-            json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
-            // json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment, this));
+            //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment));
+            //json.put("deviceData", DataCollector.collectDeviceData(braintreeFragment, this));
 
             if (paymentMethodNonce instanceof PayPalAccountNonce) {
                 PayPalAccountNonce pp = (PayPalAccountNonce) paymentMethodNonce;

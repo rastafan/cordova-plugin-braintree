@@ -7,11 +7,19 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://cardinalcommerce.bintray.com/android"
+        credentials {
+            username 'braintree-team-sdk@cardinalcommerce'
+            password '220cc9476025679c4e5c843666c27d97cfb0f951'
+        }
+    }
+}
+
 dependencies {
-    api 'com.braintreepayments.api:braintree:2.+'
-    api 'com.braintreepayments.api:drop-in:3.+'
+    api 'com.braintreepayments.api:drop-in:4.5.0'
     api 'com.google.android.gms:play-services-wallet:+'
-    api 'io.card:android-sdk:5.5.1'
 }
 
 def getPackageName() {
