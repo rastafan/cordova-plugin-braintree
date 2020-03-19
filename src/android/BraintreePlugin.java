@@ -157,11 +157,11 @@ public final class BraintreePlugin extends CordovaPlugin implements PaymentMetho
         dropInRequest.cardholderNameStatus(CardForm.FIELD_REQUIRED);
         dropInRequest.vaultManager(true);
 
-        ThreeDSecureRequest threeDRequest = new ThreeDSecureRequest();
-        threeDRequest.amount(amount);
-        threeDRequest.email(email);
-        threeDRequest.versionRequested(ThreeDSecureRequest.VERSION_2);
-        dropInRequest.threeDSecureRequest(threeDRequest);
+        // ThreeDSecureRequest threeDRequest = new ThreeDSecureRequest();
+        // threeDRequest.amount(amount);
+        // threeDRequest.email(email);
+        // threeDRequest.versionRequested(ThreeDSecureRequest.VERSION_2);
+        // dropInRequest.threeDSecureRequest(threeDRequest);
 
         if (dropInRequest == null) {
             _callbackContext.error("The Braintree client failed to initialize.");

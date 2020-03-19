@@ -173,13 +173,13 @@ NSString *countryCode;
 
 
     // 3DSecure is mandatory
-    NSDecimalNumber* amount3D = (NSDecimalNumber *)[command.arguments objectAtIndex:0];
-    BTThreeDSecureRequest *threeDRequest = [[BTThreeDSecureRequest alloc] init];
-    threeDRequest.amount = amount3D;
-    threeDRequest.email = email;
-    threeDRequest.versionRequested = BTThreeDSecureVersion2;
+    // NSDecimalNumber* amount3D = (NSDecimalNumber *)[command.arguments objectAtIndex:0];
+    // BTThreeDSecureRequest *threeDRequest = [[BTThreeDSecureRequest alloc] init];
+    // threeDRequest.amount = amount3D;
+    // threeDRequest.email = email;
+    // threeDRequest.versionRequested = BTThreeDSecureVersion2;
     
-    paymentRequest.threeDSecureRequest = threeDRequest;
+    // paymentRequest.threeDSecureRequest = threeDRequest;
     
     BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:self.token request:paymentRequest handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
         [self.viewController dismissViewControllerAnimated:YES completion:nil];
